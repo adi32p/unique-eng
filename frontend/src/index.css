@@ -1,0 +1,305 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Unique.EP - Nature-Inspired Design System
+   All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Nature-Inspired Color Palette */
+    --background: 60 30% 98%;
+    --foreground: 150 30% 15%;
+
+    --card: 60 20% 97%;
+    --card-foreground: 150 30% 15%;
+
+    --popover: 60 20% 97%;
+    --popover-foreground: 150 30% 15%;
+
+    /* Primary: Deep Forest Green */
+    --primary: 152 45% 25%;
+    --primary-foreground: 60 30% 98%;
+
+    /* Secondary: Earthy Brown */
+    --secondary: 30 35% 35%;
+    --secondary-foreground: 60 30% 98%;
+
+    /* Muted: Soft sage */
+    --muted: 120 15% 90%;
+    --muted-foreground: 150 20% 40%;
+
+    /* Accent: Sky Blue */
+    --accent: 200 65% 55%;
+    --accent-foreground: 60 30% 98%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 60 30% 98%;
+
+    --border: 120 15% 85%;
+    --input: 120 15% 85%;
+    --ring: 152 45% 25%;
+
+    --radius: 0.75rem;
+
+    /* Extended Nature Palette */
+    --leaf: 142 55% 35%;
+    --leaf-light: 142 45% 75%;
+    --forest: 152 45% 20%;
+    --moss: 120 25% 45%;
+    --earth: 30 40% 30%;
+    --earth-light: 35 30% 75%;
+    --sky: 200 70% 60%;
+    --sky-light: 200 60% 85%;
+    --sunrise: 35 85% 60%;
+    --sunset: 15 75% 55%;
+
+    /* Gradients */
+    --gradient-forest: linear-gradient(135deg, hsl(152 45% 25%), hsl(142 55% 35%));
+    --gradient-earth: linear-gradient(135deg, hsl(30 35% 35%), hsl(35 30% 50%));
+    --gradient-sky: linear-gradient(180deg, hsl(200 70% 60%), hsl(200 60% 85%));
+    --gradient-sunrise: linear-gradient(135deg, hsl(35 85% 60%), hsl(15 75% 55%));
+
+    /* Shadows */
+    --shadow-nature: 0 4px 20px -4px hsl(152 45% 25% / 0.15);
+    --shadow-elevated: 0 8px 30px -8px hsl(152 45% 25% / 0.2);
+    --shadow-glow: 0 0 20px hsl(152 45% 25% / 0.3);
+
+    /* Sidebar */
+    --sidebar-background: 150 25% 15%;
+    --sidebar-foreground: 60 30% 95%;
+    --sidebar-primary: 142 55% 45%;
+    --sidebar-primary-foreground: 60 30% 98%;
+    --sidebar-accent: 150 30% 22%;
+    --sidebar-accent-foreground: 60 30% 95%;
+    --sidebar-border: 150 20% 25%;
+    --sidebar-ring: 142 55% 45%;
+  }
+
+  .dark {
+    --background: 150 25% 8%;
+    --foreground: 60 20% 95%;
+
+    --card: 150 25% 12%;
+    --card-foreground: 60 20% 95%;
+
+    --popover: 150 25% 12%;
+    --popover-foreground: 60 20% 95%;
+
+    --primary: 142 50% 45%;
+    --primary-foreground: 150 30% 10%;
+
+    --secondary: 35 35% 45%;
+    --secondary-foreground: 60 20% 95%;
+
+    --muted: 150 20% 18%;
+    --muted-foreground: 120 15% 65%;
+
+    --accent: 200 60% 50%;
+    --accent-foreground: 60 20% 95%;
+
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 60 20% 95%;
+
+    --border: 150 20% 20%;
+    --input: 150 20% 20%;
+    --ring: 142 50% 45%;
+
+    --leaf: 142 50% 45%;
+    --leaf-light: 142 35% 25%;
+    --forest: 152 40% 15%;
+    --moss: 120 30% 35%;
+    --earth: 35 35% 40%;
+    --earth-light: 35 25% 25%;
+    --sky: 200 55% 45%;
+    --sky-light: 200 40% 25%;
+    --sunrise: 35 70% 50%;
+    --sunset: 15 65% 45%;
+
+    --sidebar-background: 150 30% 6%;
+    --sidebar-foreground: 60 20% 90%;
+    --sidebar-primary: 142 50% 50%;
+    --sidebar-primary-foreground: 150 30% 10%;
+    --sidebar-accent: 150 25% 12%;
+    --sidebar-accent-foreground: 60 20% 90%;
+    --sidebar-border: 150 20% 15%;
+    --sidebar-ring: 142 50% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Nature-themed glass effect */
+  .glass-nature {
+    @apply bg-background/80 backdrop-blur-md border border-border/50;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-forest {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--leaf)));
+  }
+
+  .bg-gradient-earth {
+    background: linear-gradient(135deg, hsl(var(--secondary)), hsl(35 30% 50%));
+  }
+
+  .bg-gradient-sky {
+    background: linear-gradient(180deg, hsl(var(--accent)), hsl(var(--sky-light)));
+  }
+
+  /* Animated underline for links */
+  .link-nature {
+    @apply relative inline-block;
+  }
+
+  .link-nature::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-primary scale-x-0 origin-right transition-transform duration-300;
+  }
+
+  .link-nature:hover::after {
+    @apply scale-x-100 origin-left;
+  }
+
+  /* Card hover effect */
+  .card-nature {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Nature button styles */
+  .btn-nature {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+
+  .btn-nature::before {
+    content: '';
+    @apply absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300;
+  }
+
+  .btn-nature:hover::before {
+    @apply translate-y-0;
+  }
+
+  /* Floating animation */
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Pulse glow */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Leaf pattern overlay */
+  .leaf-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5c-8 8-25 20-25 35 0 10 10 15 25 15s25-5 25-15c0-15-17-27-25-35z' fill='%2322c55e' fill-opacity='0.03'/%3E%3C/svg%3E");
+  }
+}
+
+@layer utilities {
+  /* Text gradient */
+  .text-gradient-nature {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-leaf;
+  }
+
+  /* Shadow utilities */
+  .shadow-nature {
+    box-shadow: var(--shadow-nature);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+}
+
+/* Keyframe animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(var(--primary) / 0.5);
+  }
+}
+
+@keyframes leaf-fall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

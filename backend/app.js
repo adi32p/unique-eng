@@ -1,0 +1,44 @@
+const express = require("express");
+const cors = require("cors");
+const authRoutes = require("./routes/auth.routes");
+const adminRoutes = require("./routes/admin.routes");
+const serviceRoutes = require("./routes/service.routes");
+const requestRoutes = require("./routes/request.routes");
+const newsRoutes = require("./routes/news.routes");
+const licenseRoutes = require("./routes/license.routes");
+const projectRoutes = require("./routes/project.routes");
+require("./jobs/licenseReminder.job");
+require("./jobs/serviceExpiryReminder.job");
+
+const app = express();
+
+// Middlewares
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:8080"],
+    credentials: true,
+  })
+);
+app.use(express.json());
+
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/services",serviceRoutes);
+app.use("/api/requests", requestRoutes);
+app.use("/api/news", newsRoutes);
+app.use("/api/licenses", licenseRoutes);
+app.use("/api/projects", projectRoutes);
+
+//User Dashboard Route
+app.use("/api/user/dashboard", require("./routes/userDashboard.routes"));
+app.use("/api/user-services", require("./routes/userService.routes"));
+
+
+
+
+// Test Route
+app.get("/", (req, res) => {
+  res.json({ message: "UniqueEPC Backend Running 🚀" });
+});
+
+module.exports = app;

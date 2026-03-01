@@ -1,0 +1,562 @@
+ok now for NewsManager.tsx file i want admin can add the news what the attributes required for the adding the news add that "import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Newspaper,
+  Plus,
+  Edit,
+  Trash2,
+  Calendar,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Section, SectionHeader } from "@/components/common/Section";
+import {
+  AnimatedSection,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/common/AnimatedSection";
+
+/* ------------------------------------------------------------------ */
+/* Mock Data (replace with API later) */
+/* ------------------------------------------------------------------ */
+const initialNews = [
+  {
+    id: "1",
+    title: "Environmental Clearance Updates 2026",
+    description:
+      "New amendments introduced by MoEF&CC for faster environmental clearances.",
+    date: "12 Jan 2026",
+  },
+  {
+    id: "2",
+    title: "Green Industry Compliance Drive",
+    description:
+      "Industries across India to undergo stricter environmental audits.",
+    date: "05 Feb 2026",
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Main Component */
+/* ------------------------------------------------------------------ */
+export default function NewsManager() {
+  const [newsList, setNewsList] = useState(initialNews);
+
+  const handleDelete = (id: string) => {
+    setNewsList((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  return (
+    <Section className="leaf-pattern">
+      <SectionHeader
+        badge="Admin Panel"
+        title="News Manager"
+        subtitle="Create, update and manage website news & announcements"
+      />
+
+      {/* Add News Button */}
+      <AnimatedSection className="flex justify-end mb-6">
+        <Button className="bg-leaf hover:bg-leaf/90 text-white">
+          <Plus size={18} className="mr-2" />
+          Add News
+        </Button>
+      </AnimatedSection>
+
+      {/* News List */}
+      <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {newsList.map((news) => (
+          <StaggerItem key={news.id}>
+            <Card className="group h-full bg-card border-border/50 hover:shadow-nature transition-shadow">
+              <CardContent className="p-6 flex flex-col h-full">
+                {/* Icon + Date */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-forest flex items-center justify-center">
+                    <Newspaper className="text-white" size={22} />
+                  </div>
+
+                  <div className="flex items-center text-sm text-muted-foreground gap-1">
+                    <Calendar size={14} />
+                    {news.date}
+                  </div>
+                </div>
+
+                {/* Title */}
+                <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                  {news.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-muted-foreground text-sm flex-1">
+                  {news.description}
+                </p>
+
+                {/* Actions */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileHover={{ opacity: 1, y: 0 }}
+                  className="mt-6 flex gap-3"
+                >
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Edit size={16} className="mr-2" />
+                    Edit
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => handleDelete(news.id)}
+                  >
+                    <Trash2 size={16} className="mr-2" />
+                    Delete
+                  </Button>
+                </motion.div>
+              </CardContent>
+            </Card>
+          </StaggerItem>
+        ))}
+      </StaggerContainer>
+    </Section>
+  );
+}
+"  what news add by admin should be reflect on the public side news page "import { useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  Leaf,
+  Calendar,
+  Clock,
+  ArrowRight,
+  Tag,
+  Search,
+  ChevronRight,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/common/AnimatedSection";
+import { Section, SectionHeader } from "@/components/common/Section";
+import { FloatingLeaves } from "@/components/common/Parallax";
+import { newsArticles } from "@/data/mockData";
+
+// Extended news data
+const allNews = [
+  ...newsArticles,
+  {
+    id: 4,
+    title: "Understanding EPR Compliance for E-Waste",
+    excerpt: "A comprehensive guide to Extended Producer Responsibility regulations for electronics manufacturers.",
+    category: "Compliance",
+    date: "2024-01-02",
+    image: "/placeholder.svg",
+    featured: false,
+    readTime: "6 min read",
+  },
+  {
+    id: 5,
+    title: "Unique.EP Wins Excellence Award 2023",
+    excerpt: "Recognized as the best environmental consultancy in the northern region for the third consecutive year.",
+    category: "Company",
+    date: "2023-12-20",
+    image: "/placeholder.svg",
+    featured: false,
+    readTime: "3 min read",
+  },
+  {
+    id: 6,
+    title: "Water Conservation Best Practices for Industries",
+    excerpt: "Implementing effective water management strategies to reduce consumption and meet compliance targets.",
+    category: "Industry",
+    date: "2023-12-15",
+    image: "/placeholder.svg",
+    featured: false,
+    readTime: "7 min read",
+  },
+];
+
+const categories = ["All", "Compliance", "Industry", "Company"];
+
+// Hero Section
+function HeroSection() {
+  return (
+    <section className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-br from-forest via-primary to-forest">
+      <FloatingLeaves />
+      <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center opacity-5" />
+
+      <div className="relative container mx-auto px-4">
+        <div className="max-w-3xl mx-auto text-center text-white">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-leaf/20 rounded-full text-leaf-light text-sm font-medium mb-6">
+              <Leaf size={16} />
+              Stay Updated
+            </span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6"
+          >
+            News &
+            <br />
+            <span className="text-leaf-light">Updates</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg text-white/80 max-w-2xl mx-auto"
+          >
+            Stay informed about the latest environmental regulations,
+            industry trends, and company updates.
+          </motion.p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Featured Article
+function FeaturedArticle() {
+  const featured = allNews.find((n) => n.featured);
+  if (!featured) return null;
+
+  return (
+    <Section className="bg-muted/30">
+      <AnimatedSection>
+        <Card className="overflow-hidden">
+          <div className="grid md:grid-cols-2">
+            <div className="aspect-video md:aspect-auto bg-gradient-to-br from-primary/50 to-forest/50 relative">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Leaf className="w-24 h-24 text-white/30" />
+              </div>
+              <Badge className="absolute top-4 left-4 bg-leaf">Featured</Badge>
+            </div>
+            <CardContent className="p-8 flex flex-col justify-center">
+              <Badge variant="outline" className="w-fit mb-4">
+                {featured.category}
+              </Badge>
+              <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
+                {featured.title}
+              </h2>
+              <p className="text-muted-foreground mb-6">{featured.excerpt}</p>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+                <span className="flex items-center gap-1">
+                  <Calendar size={14} />
+                  {new Date(featured.date).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock size={14} />
+                  5 min read
+                </span>
+              </div>
+              <Button className="w-fit" asChild>
+                <Link to={`/news/${featured.id}`}>
+                  Read Article
+                  <ArrowRight size={16} className="ml-2" />
+                </Link>
+              </Button>
+            </CardContent>
+          </div>
+        </Card>
+      </AnimatedSection>
+    </Section>
+  );
+}
+
+// News Grid
+function NewsGrid() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredNews = allNews.filter((article) => {
+    const matchesCategory =
+      selectedCategory === "All" || article.category === selectedCategory;
+    const matchesSearch =
+      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  return (
+    <Section>
+      <SectionHeader
+        badge="Latest Articles"
+        title="Recent Updates"
+        subtitle="Industry news, compliance updates, and company announcements"
+      />
+
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row gap-4 mb-12">
+        <div className="relative flex-1 max-w-md">
+          <Search
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            placeholder="Search articles..."
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <Button
+              key={category}
+              size="sm"
+              variant={selectedCategory === category ? "default" : "outline"}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Grid */}
+      {filteredNews.length > 0 ? (
+        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredNews.map((article) => (
+            <StaggerItem key={article.id}>
+              <Card className="h-full group card-nature overflow-hidden">
+                <div className="aspect-video relative bg-gradient-to-br from-primary/30 to-forest/30">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Leaf className="w-16 h-16 text-white/30 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <Badge className="absolute top-3 left-3" variant="secondary">
+                    {article.category}
+                  </Badge>
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1">
+                      <Calendar size={12} />
+                      {new Date(article.date).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                    {article.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                    {article.excerpt}
+                  </p>
+                  <Link
+                    to={`/news/${article.id}`}
+                    className="inline-flex items-center text-primary font-medium text-sm hover:gap-2 transition-all"
+                  >
+                    Read More <ChevronRight size={14} />
+                  </Link>
+                </CardContent>
+              </Card>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No articles found matching your criteria.</p>
+        </div>
+      )}
+    </Section>
+  );
+}
+
+// Newsletter Section
+function NewsletterSection() {
+  return (
+    <Section className="bg-gradient-to-r from-primary via-forest to-primary text-white">
+      <div className="text-center py-8">
+        <AnimatedSection>
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
+            Subscribe to Our Newsletter
+          </h2>
+          <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+            Get the latest environmental news and compliance updates delivered to your inbox.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+            />
+            <Button className="bg-white text-primary hover:bg-white/90 shrink-0">
+              Subscribe
+              <ArrowRight size={16} className="ml-2" />
+            </Button>
+          </div>
+        </AnimatedSection>
+      </div>
+    </Section>
+  );
+}
+
+// Main News Page
+export default function NewsPage() {
+  return (
+    <>
+      <HeroSection />
+      <FeaturedArticle />
+      <NewsGrid />
+      <NewsletterSection />
+    </>
+  );
+}
+" i ams ahring the app.tsx file code for your understanding of routing "import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { PublicLayout } from "@/components/layout/PublicLayout";
+import { AuthLayout } from "@/components/layout/AuthLayout";
+import { UserLayout } from "@/components/layout/UserLayout";
+import { AdminLayout } from "@/components/layout/AdminLayout";
+import LandingPage from "@/pages/public/LandingPage";
+import AboutPage from "@/pages/public/AboutPage";
+import ServicesPage from "@/pages/public/ServicesPage";
+import SectorsPage from "@/pages/public/SectorsPage";
+import GalleryPage from "@/pages/public/GalleryPage";
+import ReviewsPage from "@/pages/public/ReviewsPage";
+import NewsPage from "@/pages/public/NewsPage";
+import ContactPage from "@/pages/public/ContactPage";
+import NotFound from "./pages/NotFound";
+import Login from "./pages/login/Login";
+import Register from "./pages/login/Register";
+import ServiceDetailPage from "./pages/services/ServiceDetailPage";
+
+// User pages
+import UserDashboard from "@/pages/user/Dashboard";
+import MyServices from "@/pages/user/MyServices";
+import ServiceProgress from "@/pages/user/ServiceProgress";
+import Documents from "@/pages/user/Documents";
+import Notifications from "@/pages/user/Notifications";
+
+import AdminDashboard from "@/pages/admin/Dashboard";
+
+import ServicesList from "@/pages/admin/Services/ServicesList";
+import AddService from "@/pages/admin/Services/AddService";
+import EditService from "@/pages/admin/Services/EditService";
+
+import GalleryManager from "@/pages/admin/Gallery/GalleryManager";
+import AddProject from "@/pages/admin/Gallery/AddProject";
+
+import NewsManager from "@/pages/admin/News/NewsManager";
+
+import UsersList from "@/pages/admin/Users/UsersList";
+
+import LicenseManager from "@/pages/admin/Licenses/LicenseManager";
+import AddLicense from "@/pages/admin/Licenses/AddLicense";
+
+import RequestsList from "@/pages/admin/ServiceRequests/RequestsList";
+
+import ProtectedRoute from "./routes/ProtectedRoute";
+import AdminRoute from "./routes/AdminRoute";
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          {/* 🌍 Public Routes */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route
+              path="/services/:serviceId"
+              element={<ServiceDetailPage />}
+            />
+            <Route path="/sectors" element={<SectorsPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/reviews" element={<ReviewsPage />} />
+            <Route path="/news" element={<NewsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+          </Route>
+
+          {/* 🔐 Auth Routes */}
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+
+          {/* 👤 USER ROUTES */}
+          <Route
+            element={
+              <ProtectedRoute allowedRole="user">
+                <UserLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/user/dashboard" element={<UserDashboard />} />
+            <Route path="/user/my-services" element={<MyServices />} />
+            <Route path="/user/service/:id" element={<ServiceProgress />} />
+            <Route path="/user/documents" element={<Documents />} />
+            <Route path="/user/notifications" element={<Notifications />} />
+          </Route>
+          
+          {/* 🛠️ ADMIN ROUTES */}
+          <Route element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+              {/* Services */}
+              <Route path="/admin/services" element={<ServicesList />} />
+              <Route path="/admin/services/add" element={<AddService />} />
+              <Route
+                path="/admin/services/edit/:id"
+                element={<EditService />}
+              />
+
+              {/* Gallery */}
+              <Route path="/admin/gallery" element={<GalleryManager />} />
+              <Route path="/admin/gallery/add" element={<AddProject />} />
+
+              {/* News */}
+              <Route path="/admin/news" element={<NewsManager />} />
+
+              {/* Users */}
+              <Route path="/admin/users" element={<UsersList />} />
+
+              {/* Licenses */}
+              <Route path="/admin/licenses" element={<LicenseManager />} />
+
+              <Route path="/admin/licenses/add" element={<AddLicense />} />
+
+              {/* Service Requests */}
+              <Route path="/admin/requests" element={<RequestsList />} />
+            </Route>
+          </Route>
+
+          {/* ❌ 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
+"
