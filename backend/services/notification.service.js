@@ -1,22 +1,20 @@
 const Notification = require("../models/Notification");
 
-exports.createNotification = async (
-  userId,
-  { title, message, type = "info" }
-) => {
+const createNotification = async (userId, data, io) => {
   const notification = await Notification.create({
     user: userId,
-    title,
-    message,
-    type,
+    title: data.title || "Notification",
+    message: data.message,
+    type: data.type || "info",
     read: false,
   });
 
-  // 🔴 Emit real-time notification
-  const io = require("../server").io; // OR use req.app.get("io") pattern
+  // 🔔 Emit real-time notification
   if (io) {
     io.to(userId.toString()).emit("new-notification", notification);
   }
 
   return notification;
 };
+
+module.exports = { createNotification };

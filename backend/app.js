@@ -7,6 +7,7 @@ const requestRoutes = require("./routes/request.routes");
 const newsRoutes = require("./routes/news.routes");
 const licenseRoutes = require("./routes/license.routes");
 const projectRoutes = require("./routes/project.routes");
+const notificationRoutes = require("./routes/notification.routes");
 require("./jobs/licenseReminder.job");
 require("./jobs/serviceExpiryReminder.job");
 
@@ -28,6 +29,7 @@ app.use("/api/requests", requestRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/licenses", licenseRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 //User Dashboard Route
 app.use("/api/user/dashboard", require("./routes/userDashboard.routes"));

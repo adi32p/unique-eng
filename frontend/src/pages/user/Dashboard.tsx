@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -54,52 +54,64 @@ export default function Dashboard() {
   ]);
 
   /* ---------------- Fetch Dashboard Data ---------------- */
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const token = localStorage.getItem("token");
+  const fetchDashboard = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-        const response = await fetch("http://localhost:5000/api/user/dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const response = await fetch(`${API_BASE}/user/dashboard`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const data = await response.json();
-
-        setStats([
-          {
-            label: "My Services",
-            value: data.myServices || 0,
-            icon: ClipboardCheck,
-            link: "/user/my-services",
-          },
-          {
-            label: "Documents",
-            value: data.documents || 0,
-            icon: FileText,
-            link: "/user/documents",
-          },
-          {
-            label: "Notifications",
-            value: data.notifications || 0,
-            icon: Bell,
-            link: "/user/notifications",
-          },
-          {
-            label: "Service Progress",
-            value: `${data.serviceProgress || 0}%`,
-            icon: TrendingUp,
-            link: "/user/my-services",
-          },
-        ]);
-      } catch (error) {
-        console.error("Failed to load dashboard data", error);
+      if (!response.ok) {
+        throw new Error("Failed to fetch dashboard");
       }
-    };
 
-    fetchDashboard();
+      const data = await response.json();
+
+      setStats([
+        {
+          label: "My Services",
+          value: data.myServices ?? 0,
+          icon: ClipboardCheck,
+          link: "/user/my-services",
+        },
+        {
+          label: "Documents",
+          value: data.documents ?? 0,
+          icon: FileText,
+          link: "/user/documents",
+        },
+        {
+          label: "Notifications",
+          value: data.notifications ?? 0,
+          icon: Bell,
+          link: "/user/notifications",
+        },
+        {
+          label: "Service Progress",
+          value: `${data.serviceProgress ?? 0}%`,
+          icon: TrendingUp,
+          link: "/user/my-services",
+        },
+      ]);
+    } catch (error) {
+      console.error("Failed to load dashboard data:", error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchDashboard();
+
+    // 🔥 Optional: auto refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchDashboard();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [fetchDashboard]);
 
   return (
     <>
@@ -151,8 +163,7 @@ export default function Dashboard() {
 
                       <motion.div
                         initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
-                        viewport={{ once: true }}
+                        animate={{ scale: 1 }}
                         transition={{ type: "spring" }}
                         className="text-3xl font-display font-bold text-primary mb-1"
                       >
