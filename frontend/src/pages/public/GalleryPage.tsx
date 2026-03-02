@@ -9,14 +9,14 @@ import {
   Tag,
   Filter,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { AnimatedSection } from "@/components/common/AnimatedSection";
-import { Section, SectionHeader } from "@/components/common/Section";
-import { FloatingLeaves } from "@/components/common/Parallax";
-import { galleryProjects, sectors, services } from "@/data/mockData";
-import { cn } from "@/lib/utils";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
+import { AnimatedSection } from "../../components/common/AnimatedSection";
+import { Section, SectionHeader } from "../../components/common/Section";
+import { FloatingLeaves } from "../../components/common/Parallax";
+import { galleryProjects, sectors, services } from "../../data/mockData";
+import { cn } from "../../lib/utils";
 
 // Hero Section
 function HeroSection() {
@@ -55,8 +55,8 @@ function HeroSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg text-white/80 max-w-2xl mx-auto"
           >
-            Explore our portfolio of successful environmental projects
-            across various sectors and services.
+            Explore our portfolio of successful environmental projects across
+            various sectors and services.
           </motion.p>
         </div>
       </div>
@@ -77,7 +77,10 @@ function FilterSection({
   setSelectedService: (s: string) => void;
 }) {
   return (
-    <Section noPadding className="py-8 sticky top-16 z-30 bg-background/95 backdrop-blur-md border-b">
+    <Section
+      noPadding
+      className="py-8 sticky top-16 z-30 bg-background/95 backdrop-blur-md border-b"
+    >
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -141,7 +144,7 @@ function ProjectShowcase({
   onProjectClick,
 }: {
   projects: typeof galleryProjects;
-  onProjectClick: (project: typeof galleryProjects[0]) => void;
+  onProjectClick: (project: (typeof galleryProjects)[0]) => void;
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -157,7 +160,9 @@ function ProjectShowcase({
     return (
       <Section>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No projects found matching your filters.</p>
+          <p className="text-muted-foreground">
+            No projects found matching your filters.
+          </p>
         </div>
       </Section>
     );
@@ -177,21 +182,35 @@ function ProjectShowcase({
               transition={{ duration: 0.5 }}
               className="absolute inset-0"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/50 to-forest/50" />
+              <img
+                src={projects[currentIndex].image}
+                alt={projects[currentIndex].title}
+                className="w-full h-full object-cover"
+              />
+
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black/50" />
+
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center text-white max-w-2xl px-8">
                   <Badge className="mb-4 bg-leaf/80">
                     {projects[currentIndex].sector}
                   </Badge>
+
                   <h2 className="text-3xl md:text-4xl font-display font-bold mb-2">
                     {projects[currentIndex].title}
                   </h2>
-                  <p className="text-white/80 mb-4">{projects[currentIndex].description}</p>
-                  <div className="flex items-center justify-center gap-4 text-sm text-white/70">
+
+                  <p className="text-white/80 mb-4">
+                    {projects[currentIndex].description}
+                  </p>
+
+                  <div className="flex items-center justify-center gap-4 text-sm text-white/80">
                     <span className="flex items-center gap-1">
                       <MapPin size={14} />
                       {projects[currentIndex].location}
                     </span>
+
                     <span className="flex items-center gap-1">
                       <Tag size={14} />
                       {projects[currentIndex].service}
@@ -227,7 +246,7 @@ function ProjectShowcase({
                 key={index}
                 className={cn(
                   "w-2 h-2 rounded-full transition-all",
-                  index === currentIndex ? "bg-white w-6" : "bg-white/50"
+                  index === currentIndex ? "bg-white w-6" : "bg-white/50",
                 )}
                 onClick={() => setCurrentIndex(index)}
               />
@@ -245,13 +264,17 @@ function ProjectShowcase({
                 "shrink-0 w-32 h-20 rounded-lg overflow-hidden relative group transition-all",
                 index === currentIndex
                   ? "ring-2 ring-primary"
-                  : "opacity-60 hover:opacity-100"
+                  : "opacity-60 hover:opacity-100",
               )}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/50 to-forest/50" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-white text-xs font-medium px-2 text-center">
-                  {project.title}
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
                 </span>
               </div>
             </button>
@@ -268,7 +291,7 @@ function ProjectGrid({
   onProjectClick,
 }: {
   projects: typeof galleryProjects;
-  onProjectClick: (project: typeof galleryProjects[0]) => void;
+  onProjectClick: (project: (typeof galleryProjects)[0]) => void;
 }) {
   return (
     <Section>
@@ -286,8 +309,14 @@ function ProjectGrid({
               onClick={() => onProjectClick(project)}
             >
               <div className="aspect-video relative bg-gradient-to-br from-primary/30 to-forest/30">
-                <div className="absolute inset-0 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Leaf className="w-16 h-16 text-white/30" />
+                <div className="aspect-video relative overflow-hidden">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition" />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-0 transition-transform">
@@ -329,7 +358,7 @@ function Lightbox({
   onNext,
   onPrev,
 }: {
-  project: typeof galleryProjects[0] | null;
+  project: (typeof galleryProjects)[0] | null;
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
@@ -382,8 +411,12 @@ function Lightbox({
 
           {/* Image */}
           <div className="aspect-video relative bg-gradient-to-br from-primary/50 to-forest/50">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Leaf className="w-32 h-32 text-white/30" />
+            <div className="aspect-video relative">
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
 
@@ -392,7 +425,9 @@ function Lightbox({
             <div className="flex items-start justify-between mb-4">
               <div>
                 <Badge className="mb-2">{project.sector}</Badge>
-                <h2 className="text-2xl font-display font-bold">{project.title}</h2>
+                <h2 className="text-2xl font-display font-bold">
+                  {project.title}
+                </h2>
               </div>
             </div>
             <p className="text-muted-foreground mb-4">{project.description}</p>
@@ -417,25 +452,36 @@ function Lightbox({
 export default function GalleryPage() {
   const [selectedSector, setSelectedSector] = useState("all");
   const [selectedService, setSelectedService] = useState("all");
-  const [selectedProject, setSelectedProject] = useState<typeof galleryProjects[0] | null>(null);
+  const [selectedProject, setSelectedProject] = useState<
+    (typeof galleryProjects)[0] | null
+  >(null);
 
   const filteredProjects = galleryProjects.filter((project) => {
-    const matchesSector = selectedSector === "all" || project.sector.toLowerCase() === selectedSector;
-    const matchesService = selectedService === "all" || project.service.toLowerCase().includes(selectedService.replace("-", " "));
+    const matchesSector =
+      selectedSector === "all" ||
+      project.sector.toLowerCase() === selectedSector;
+    const matchesService =
+      selectedService === "all" ||
+      project.service.toLowerCase().includes(selectedService.replace("-", " "));
     return matchesSector && matchesService;
   });
 
   const handleNext = () => {
     if (!selectedProject) return;
-    const currentIndex = filteredProjects.findIndex((p) => p.id === selectedProject.id);
+    const currentIndex = filteredProjects.findIndex(
+      (p) => p.id === selectedProject.id,
+    );
     const nextIndex = (currentIndex + 1) % filteredProjects.length;
     setSelectedProject(filteredProjects[nextIndex]);
   };
 
   const handlePrev = () => {
     if (!selectedProject) return;
-    const currentIndex = filteredProjects.findIndex((p) => p.id === selectedProject.id);
-    const prevIndex = (currentIndex - 1 + filteredProjects.length) % filteredProjects.length;
+    const currentIndex = filteredProjects.findIndex(
+      (p) => p.id === selectedProject.id,
+    );
+    const prevIndex =
+      (currentIndex - 1 + filteredProjects.length) % filteredProjects.length;
     setSelectedProject(filteredProjects[prevIndex]);
   };
 

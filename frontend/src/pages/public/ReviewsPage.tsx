@@ -10,13 +10,13 @@ import {
   Filter,
   ArrowRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/common/AnimatedSection";
-import { Section, SectionHeader } from "@/components/common/Section";
-import { FloatingLeaves } from "@/components/common/Parallax";
-import { cn } from "@/lib/utils";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "../../components/common/AnimatedSection";
+import { Section, SectionHeader } from "../../components/common/Section";
+import { FloatingLeaves } from "../../components/common/Parallax";
+import { cn } from "../../lib/utils";
 
 // Extended testimonials data
 const allTestimonials = [

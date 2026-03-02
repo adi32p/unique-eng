@@ -10,14 +10,14 @@ import {
   Search,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/common/AnimatedSection";
-import { Section, SectionHeader } from "@/components/common/Section";
-import { FloatingLeaves } from "@/components/common/Parallax";
-import { newsArticles } from "@/data/mockData";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
+import { Input } from "../../components/ui/input";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "../../components/common/AnimatedSection";
+import { Section, SectionHeader } from "../../components/common/Section";
+import { FloatingLeaves } from "../../components/common/Parallax";
+import { newsArticles } from "../../data/mockData";
 
 // Extended news data
 const allNews = [

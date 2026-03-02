@@ -39,6 +39,11 @@ const userServiceSchema = new mongoose.Schema(
     /* 🔥 NEW FIELDS */
     completedAt: Date,
     expiryDate: Date,
+
+    reminderSent: {
+      type: [Number],
+      default: [],
+    },
   },
   { timestamps: true }
 );

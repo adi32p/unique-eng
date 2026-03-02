@@ -9,7 +9,7 @@ const licenseRoutes = require("./routes/license.routes");
 const projectRoutes = require("./routes/project.routes");
 const notificationRoutes = require("./routes/notification.routes");
 require("./jobs/licenseReminder.job");
-require("./jobs/serviceExpiryReminder.job");
+require("./jobs/expiryReminder");
 
 const app = express();
 

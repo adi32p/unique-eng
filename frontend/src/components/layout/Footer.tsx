@@ -105,21 +105,21 @@ export function Footer() {
                 className="flex items-center gap-3 text-white/70 hover:text-leaf transition-colors"
               >
                 <Phone size={18} />
-                +91 98765 43210
+                +91 72047 96446
               </a>
               <a
                 href="mailto:info@uniqueep.com"
                 className="flex items-center gap-3 text-white/70 hover:text-leaf transition-colors"
               >
                 <Mail size={18} />
-                info@uniqueep.com
+                uniqueengi.global@gmail.com
               </a>
               <div className="flex items-start gap-3 text-white/70">
                 <MapPin size={18} className="mt-1 shrink-0" />
                 <span>
-                  123 Environmental Plaza, Green Avenue,
+                  Near Tapovan International School, A/p. Ambethan, Tal. Khed,
                   <br />
-                  New Delhi - 110001, India
+                  Dist. Pune - 410501, Maharashtra, India
                 </span>
               </div>
             </div>

@@ -12,12 +12,12 @@ import {
   FileCheck,
   ClipboardList,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/common/AnimatedSection";
-import { Section, SectionHeader } from "@/components/common/Section";
-import { FloatingLeaves, Parallax } from "@/components/common/Parallax";
-import { services, sectors, statistics, testimonials } from "@/data/mockData";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "../../components/common/AnimatedSection";
+import { Section, SectionHeader } from "../../components/common/Section";
+import { FloatingLeaves, Parallax } from "../../components/common/Parallax";
+import { services, sectors, statistics, testimonials } from "../../data/mockData";
 import { useRef } from "react";
 
 // Icon mapping
@@ -47,7 +47,9 @@ function HeroSection() {
       className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-forest via-primary to-forest"
     >
       {/* Animated background elements */}
-      <FloatingLeaves className="pointer-events-none" />
+      <div className="pointer-events-none">
+        <FloatingLeaves />
+      </div>
 
       <div className="absolute inset-0 bg-[url('/placeholder.svg')] bg-cover bg-center opacity-10 pointer-events-none" />
 

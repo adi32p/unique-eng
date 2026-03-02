@@ -1,46 +1,62 @@
 const cron = require("node-cron");
 const UserService = require("../models/userService");
-const User = require("../models/User");
-const sendEmail = require("../utils/sendEmail");
+const { sendEmail } = require("../utils/mailer"); // ✅ correct file
 
-function daysBetween(date1, date2) {
-  const diffTime = date2 - date1;
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+function getDaysLeft(today, expiryDate) {
+  const start = new Date(today.setHours(0, 0, 0, 0));
+  const end = new Date(new Date(expiryDate).setHours(0, 0, 0, 0));
+  const diff = end - start;
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
-// Run once every day at 9:00 AM
+// ✅ RUN DAILY AT 9 AM
 cron.schedule("0 9 * * *", async () => {
-  console.log("🔁 Running expiry reminder job...");
-
-  const today = new Date();
+  console.log("🔁 Running Service Expiry Reminder Job...");
 
   try {
+    const today = new Date();
+
     const services = await UserService.find({
       status: "Completed",
       expiryDate: { $ne: null },
     }).populate("user service");
 
     for (let item of services) {
-      const daysLeft = daysBetween(today, item.expiryDate);
+      const daysLeft = getDaysLeft(today, item.expiryDate);
 
-      if ([60, 30, 15].includes(daysLeft)) {
-        await sendEmail({
-          to: item.user.email,
-          subject: `Service Expiry Reminder`,
-          html: `
-            <h2>Hello ${item.user.name},</h2>
-            <p>Your service <b>${item.service.title}</b> will expire in <b>${daysLeft} days</b>.</p>
-            <p>Expiry Date: ${item.expiryDate.toDateString()}</p>
-            <p>Please renew before expiry to avoid interruption.</p>
-          `,
-        });
+      const reminderDays = [60, 30, 15];
 
-        console.log(
-          `📧 Reminder sent to ${item.user.email} - ${daysLeft} days left`
-        );
+      if (reminderDays.includes(daysLeft)) {
+        // ✅ prevent duplicate
+        if (!item.reminderSent.includes(daysLeft)) {
+          const subject = `Service Expiry Reminder - ${daysLeft} Days Left`;
+
+          const message = `
+Hello ${item.user.name},
+
+Your service "${item.service.title}" will expire in ${daysLeft} days.
+
+Expiry Date: ${item.expiryDate.toDateString()}
+
+Please renew it before expiry.
+
+Regards,
+Unique EPC Team
+`;
+
+          await sendEmail(item.user.email, subject, message);
+
+          // Save reminder history
+          item.reminderSent.push(daysLeft);
+          await item.save();
+
+          console.log(
+            `📧 Reminder sent to ${item.user.email} - ${daysLeft} days left`
+          );
+        }
       }
     }
   } catch (error) {
-    console.error("Expiry Reminder Error:", error);
+    console.error("❌ Expiry Reminder Error:", error);
   }
 });

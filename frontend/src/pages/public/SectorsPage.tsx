@@ -242,10 +242,10 @@ function SectorsDetailSection() {
 // Stats Banner
 function StatsBanner() {
   const stats = [
-    { value: "635+", label: "Industrial Projects" },
-    { value: "180+", label: "Commercial Projects" },
-    { value: "120+", label: "Infrastructure Projects" },
-    { value: "85+", label: "Government Projects" },
+    { value: "35+", label: "Industrial Projects" },
+    { value: "10+", label: "Commercial Projects" },
+    { value: "15+", label: "Infrastructure Projects" },
+    { value: "45+", label: "Government Projects" },
   ];
 
   return (
