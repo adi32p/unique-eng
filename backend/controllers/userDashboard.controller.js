@@ -1,6 +1,6 @@
 const UserService = require("../models/userService");
 const Notification = require("../models/notification");
-const Document = require("../models/Document"); // if you have
+const Document = require("../models/document"); // if you have
 
 exports.getDashboardStats = async (req, res) => {
   try {
