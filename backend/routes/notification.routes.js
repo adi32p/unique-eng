@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const Notification = require("../models/Notification");
+const Notification = require("../models/notification");
 
 const {
   getUserNotifications,
