@@ -10,7 +10,7 @@ const TOKEN_KEY = "token";
 ========================================================= */
 const api = axios.create({
   baseURL: "https://uniqueeng.onrender.com/api",
-  timeout: 15000,
+  timeout: 150000,
   headers: { "Content-Type": "application/json" },
 });
 
