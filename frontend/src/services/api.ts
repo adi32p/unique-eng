@@ -9,11 +9,9 @@ const TOKEN_KEY = "token";
    🌍 AXIOS INSTANCE
 ========================================================= */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  baseURL: "https://uniqueeng.onrender.com/api",
   timeout: 15000,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 });
 
 /* =========================================================
