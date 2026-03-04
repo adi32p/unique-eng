@@ -19,7 +19,8 @@ import { Section } from "../../components/common/Section";
 import { FloatingLeaves } from "../../components/common/Parallax";
 import { useToast } from "../../hooks/use-toast";
 
-const API_BASE = "http://localhost:5000/api";
+import { servicesApi, requestsApi } from "../../services/api";
+
 
 /* ================= HERO ================= */
 
@@ -66,8 +67,7 @@ function ContactFormSection() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch(`${API_BASE}/services`);
-        const data = await response.json();
+        const { data } = await servicesApi.getAll();
         setServices(data);
       } catch (error) {
         console.error("Failed to fetch services", error);
@@ -112,26 +112,12 @@ function ContactFormSection() {
         return;
       }
 
-      const response = await fetch(`${API_BASE}/requests`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ✅ correct
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          service: formData.service,
-        }),
+      await requestsApi.create({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        service: formData.service,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to submit request");
-      }
-
       toast({
         title: "Request Submitted!",
         description: "Admin will review your request shortly.",
