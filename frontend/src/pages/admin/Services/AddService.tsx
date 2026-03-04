@@ -1,17 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import {
-  FilePlus,
-  Save,
-  ClipboardList,
-  CheckCircle,
-} from "lucide-react";
+import { FilePlus, Save, ClipboardList, CheckCircle } from "lucide-react";
 
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Section } from "../../../components/common/Section";
 import { AnimatedSection } from "../../../components/common/AnimatedSection";
+import { servicesApi } from "../../../services/api";
 
 /* -----------------------------
    Add Service Page
@@ -42,40 +38,27 @@ export default function AddService() {
     const form = e.currentTarget;
 
     const payload = {
-      title: (form.elements.namedItem("serviceTitle") as HTMLInputElement).value,
-      shortDescription: (form.elements.namedItem("shortDescription") as HTMLTextAreaElement).value,
+      title: (form.elements.namedItem("serviceTitle") as HTMLInputElement)
+        .value,
+      shortDescription: (
+        form.elements.namedItem("shortDescription") as HTMLTextAreaElement
+      ).value,
       features: features.filter((f) => f.trim() !== ""),
     };
 
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/api/services", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message || "Failed to create service");
-        return;
-      }
+      await servicesApi.create(payload);
 
       alert("Service created successfully");
       navigate("/admin/services");
 
-      // Reset form
       form.reset();
       setFeatures([""]);
-
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error:", error);
-      alert("Something went wrong");
+      alert(error.response?.data?.message || "Failed to create service");
     } finally {
       setLoading(false);
     }
@@ -105,7 +88,6 @@ export default function AddService() {
         <Card className="bg-background/80 backdrop-blur border-border/50 hover:shadow-nature transition-shadow">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
-              
               {/* Service Title */}
               <div>
                 <label className="text-sm font-medium">Service Title</label>
@@ -136,7 +118,12 @@ export default function AddService() {
                     <ClipboardList size={16} />
                     Service Features
                   </label>
-                  <Button type="button" variant="outline" size="sm" onClick={addFeature}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addFeature}
+                  >
                     + Add Feature
                   </Button>
                 </div>

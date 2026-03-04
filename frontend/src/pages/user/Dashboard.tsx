@@ -20,7 +20,7 @@ import {
   StaggerItem,
 } from "../../components/common/AnimatedSection";
 
-const API_BASE = "http://localhost:5000/api";
+import { userDashboardApi } from "../../services/api";
 
 /* ------------------------------------------------------------------ */
 /* Dashboard Page */
@@ -56,20 +56,9 @@ export default function Dashboard() {
   /* ---------------- Fetch Dashboard Data ---------------- */
   const fetchDashboard = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+      const res = await userDashboardApi.getStats();
 
-      const response = await fetch(`${API_BASE}/user/dashboard`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch dashboard");
-      }
-
-      const data = await response.json();
+      const data = res.data;
 
       setStats([
         {
@@ -247,9 +236,7 @@ function ActionCard({
           </div>
 
           <h3 className="text-lg font-semibold mb-2">{title}</h3>
-          <p className="text-muted-foreground text-sm mb-6">
-            {description}
-          </p>
+          <p className="text-muted-foreground text-sm mb-6">{description}</p>
 
           <Button asChild variant="outline" className="mt-auto">
             <Link to={link}>

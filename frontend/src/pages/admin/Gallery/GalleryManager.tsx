@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 import {
   Image as ImageIcon,
   Plus,
-  Edit,
   Trash2,
   MapPin,
   Pencil,
   Tag,
 } from "lucide-react";
-
 import { Link } from "react-router-dom";
+
+import api from "../../../services/api"; // ✅ IMPORT YOUR AXIOS INSTANCE
 
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
@@ -21,8 +21,6 @@ import {
   StaggerContainer,
   StaggerItem,
 } from "../../../components/common/AnimatedSection";
-
-const API_BASE = "http://localhost:5000/api";
 
 /* ------------------------------------------------------------------ */
 /* Types */
@@ -50,9 +48,8 @@ export default function GalleryManager() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch(`${API_BASE}/projects`);
-      const data = await response.json();
-      setProjects(data);
+      const response = await api.get("/projects"); // ✅ using api
+      setProjects(response.data);
     } catch (error) {
       console.error("Failed to fetch projects", error);
     }
@@ -61,18 +58,7 @@ export default function GalleryManager() {
   /* ---------------- Delete Project ---------------- */
   const handleDelete = async (id: string) => {
     try {
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(`${API_BASE}/projects/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Delete failed");
-      }
+      await api.delete(`/projects/${id}`); // ✅ token auto added
 
       setProjects((prev) => prev.filter((p) => p._id !== id));
     } catch (error) {
@@ -104,7 +90,7 @@ export default function GalleryManager() {
           <StaggerItem key={project._id}>
             <Card className="group h-full bg-card border-border/50 hover:shadow-nature transition-shadow overflow-hidden">
               
-              {/* Real Image */}
+              {/* Image */}
               <div className="aspect-video overflow-hidden">
                 {project.image ? (
                   <img
@@ -120,12 +106,10 @@ export default function GalleryManager() {
               </div>
 
               <CardContent className="p-5 flex flex-col h-full">
-                {/* Title */}
                 <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
                   {project.title}
                 </h3>
 
-                {/* Meta */}
                 <div className="space-y-2 text-sm text-muted-foreground mb-4">
                   <div className="flex items-center gap-2">
                     <MapPin size={14} />
@@ -137,34 +121,33 @@ export default function GalleryManager() {
                   </div>
                 </div>
 
-                {/* Badges */}
                 <div className="flex gap-2 mb-6">
                   <Badge variant="secondary">{project.sector}</Badge>
                 </div>
                 
                 <div className="flex gap-3 pt-4 border-t border-border/50">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1"
-                        asChild
-                      >
-                        <Link to={`/admin/services/edit/${project._id}`}>
-                          <Pencil size={16} className="mr-2" />
-                          Edit
-                        </Link>
-                      </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    asChild
+                  >
+                    <Link to={`/admin/gallery/edit/${project._id}`}>
+                      <Pencil size={16} className="mr-2" />
+                      Edit
+                    </Link>
+                  </Button>
 
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="flex-1 bg-red-500/10 text-red-500 hover:bg-red-500/20"
-                        onClick={() => handleDelete((project._id))}
-                      >
-                        <Trash2 size={16} className="mr-2" />
-                        Delete
-                      </Button>
-                    </div>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="flex-1 bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                    onClick={() => handleDelete(project._id)}
+                  >
+                    <Trash2 size={16} className="mr-2" />
+                    Delete
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </StaggerItem>

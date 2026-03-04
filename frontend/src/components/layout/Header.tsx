@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, User, LogIn } from "lucide-react";
+import { Menu, X, ChevronDown, User, LogIn, LogOut } from "lucide-react";
 import { Logo } from "../../components/common/Logo";
 import { Button } from "../../components/ui/button";
 import { cn } from "../../lib/utils";
@@ -13,7 +13,10 @@ const navItems = [
     label: "Services",
     href: "/services",
     children: [
-      { label: "Environmental Clearance", href: "/services/environmental-clearance" },
+      {
+        label: "Environmental Clearance",
+        href: "/services/environmental-clearance",
+      },
       { label: "PCB Licenses", href: "/services/pcb-licenses" },
       { label: "EPC Services", href: "/services/epc" },
       { label: "PMC Services", href: "/services/pmc" },
@@ -33,6 +36,18 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("email");
+    localStorage.removeItem("name");
+
+    setIsMobileMenuOpen(false);
+    navigate("/login");
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,21 +74,22 @@ export function Header() {
         animate={{ y: 0 }}
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-            "bg-background/95 backdrop-blur-md shadow-nature py-2"
+          "bg-background/95 backdrop-blur-md shadow-nature py-2",
         )}
       >
         <div className="container mx-auto px-4">
           <nav className="flex items-center justify-between">
             {/* Logo */}
             <Logo variant={isScrolled ? "dark" : "auto"} size="md" />
-
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => (
                 <div
                   key={item.label}
                   className="relative"
-                  onMouseEnter={() => item.children && setActiveDropdown(item.label)}
+                  onMouseEnter={() =>
+                    item.children && setActiveDropdown(item.label)
+                  }
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
                   <Link
@@ -82,7 +98,7 @@ export function Header() {
                       "flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
                       isActive(item.href)
                         ? "text-primary bg-primary/10"
-                        : "text-foreground/80 hover:text-primary hover:bg-primary/5"
+                        : "text-foreground/80 hover:text-primary hover:bg-primary/5",
                     )}
                   >
                     {item.label}
@@ -91,7 +107,7 @@ export function Header() {
                         size={14}
                         className={cn(
                           "transition-transform",
-                          activeDropdown === item.label && "rotate-180"
+                          activeDropdown === item.label && "rotate-180",
                         )}
                       />
                     )}
@@ -122,23 +138,36 @@ export function Header() {
                 </div>
               ))}
             </div>
-
             {/* CTA Buttons */}
             <div className="hidden lg:flex items-center gap-3">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/login" className="flex items-center gap-2">
-                  <LogIn size={16} />
-                  Login
-                </Link>
-              </Button>
-              <Button size="sm" className="btn-nature" asChild>
-                <Link to="/register" className="flex items-center gap-2">
-                  <User size={16} />
-                  Get Started
-                </Link>
-              </Button>
-            </div>
+              {!isLoggedIn ? (
+                <>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/login" className="flex items-center gap-2">
+                      <LogIn size={16} />
+                      Login
+                    </Link>
+                  </Button>
 
+                  <Button size="sm" className="btn-nature" asChild>
+                    <Link to="/register" className="flex items-center gap-2">
+                      <User size={16} />
+                      Get Started
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </Button>
+              )}
+            </div>
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -146,7 +175,7 @@ export function Header() {
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            </button>{" "}
           </nav>
         </div>
       </motion.header>
@@ -191,7 +220,7 @@ export function Header() {
                           "flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                           isActive(item.href)
                             ? "text-primary bg-primary/10"
-                            : "text-foreground/80 hover:text-primary hover:bg-primary/5"
+                            : "text-foreground/80 hover:text-primary hover:bg-primary/5",
                         )}
                       >
                         {item.label}
@@ -215,12 +244,26 @@ export function Header() {
                 </div>
 
                 <div className="mt-8 space-y-3">
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link to="/login">Login</Link>
-                  </Button>
-                  <Button className="w-full" asChild>
-                    <Link to="/register">Get Started</Link>
-                  </Button>
+                  {!isLoggedIn ? (
+                    <>
+                      <Button variant="outline" className="w-full" asChild>
+                        <Link to="/login">Login</Link>
+                      </Button>
+
+                      <Button className="w-full" asChild>
+                        <Link to="/register">Get Started</Link>
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="destructive"
+                      className="w-full flex items-center justify-center gap-2"
+                      onClick={handleLogout}
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.nav>

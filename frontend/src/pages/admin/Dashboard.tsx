@@ -15,11 +15,7 @@ import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Section } from "../../components/common/Section";
 import { AnimatedSection } from "../../components/common/AnimatedSection";
-
-/* -----------------------------
-   API BASE
--------------------------------- */
-const API_BASE = "http://localhost:5000/api";
+import { adminApi } from "../../services/api";
 
 /* -----------------------------
    Quick Actions (unchanged)
@@ -64,22 +60,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE}/admin/dashboard`,
-          {
-            headers: {
-              Authorization: `Bearer ${
-                localStorage.getItem("token") || ""
-              }`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch dashboard data");
-        }
-
-        const data = await response.json();
+        const { data } = await adminApi.getDashboard();
 
         setDashboardData({
           totalUsers: data.totalUsers || 0,

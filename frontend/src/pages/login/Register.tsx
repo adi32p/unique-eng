@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { User, Mail, Lock, Leaf } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
-import { getUsers, saveUsers } from "../../utils/storage";
+import { authApi } from "../../services/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -19,25 +19,12 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message);
-        return;
-      }
+      await authApi.register(form);
 
       alert("Account created successfully!");
       navigate("/login");
-    } catch (error) {
-      alert("Registration failed");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Registration failed");
     }
   };
 

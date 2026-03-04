@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  CheckCircle,
-  Clock,
-  FileText,
-  ShieldCheck,
-} from "lucide-react";
+import { CheckCircle, Clock, FileText, ShieldCheck } from "lucide-react";
 
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
@@ -17,6 +12,7 @@ import {
   StaggerContainer,
   StaggerItem,
 } from "../../components/common/AnimatedSection";
+import { userServicesApi } from "../../services/api";
 
 /* ------------------------------------------------------------------ */
 /* Service Progress Page */
@@ -32,26 +28,13 @@ export default function ServiceProgress() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const token = localStorage.getItem("token");
+        if (!id) return;
 
-        const res = await fetch(
-          `http://localhost:5000/api/user-services/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await userServicesApi.getById(id);
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch service data");
-        }
-
-        const data = await res.json();
-
-        setServiceProgress(data);
+        setServiceProgress(res.data);
       } catch (err: any) {
-        setError(err.message);
+        setError(err.response?.data?.message || "Failed to fetch service data");
       } finally {
         setLoading(false);
       }
@@ -78,14 +61,10 @@ export default function ServiceProgress() {
   function StatusBadge({ status }: { status: string }) {
     switch (status) {
       case "completed":
-        return (
-          <Badge className="bg-leaf/20 text-leaf">Completed</Badge>
-        );
+        return <Badge className="bg-leaf/20 text-leaf">Completed</Badge>;
       case "active":
         return (
-          <Badge className="bg-primary/20 text-primary">
-            In Progress
-          </Badge>
+          <Badge className="bg-primary/20 text-primary">In Progress</Badge>
         );
       default:
         return <Badge variant="secondary">Pending</Badge>;
@@ -143,9 +122,7 @@ export default function ServiceProgress() {
           <Card className="max-w-3xl mx-auto bg-background/80 backdrop-blur-sm border-leaf/10">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-lg">
-                  Overall Completion
-                </h3>
+                <h3 className="font-semibold text-lg">Overall Completion</h3>
                 <span className="text-primary font-bold">
                   {serviceProgress?.progress || 0}%
                 </span>
@@ -171,44 +148,40 @@ export default function ServiceProgress() {
         />
 
         <StaggerContainer className="max-w-3xl mx-auto space-y-4">
-          {serviceProgress?.steps?.map(
-            (step: any, index: number) => (
-              <StaggerItem key={step._id}>
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
+          {serviceProgress?.steps?.map((step: any, index: number) => (
+            <StaggerItem key={step._id}>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card
+                  className={`card-nature border-border/50 ${
+                    step.status === "active"
+                      ? "bg-primary/5 border-primary/30"
+                      : "bg-card"
+                  }`}
                 >
-                  <Card
-                    className={`card-nature border-border/50 ${
-                      step.status === "active"
-                        ? "bg-primary/5 border-primary/30"
-                        : "bg-card"
-                    }`}
-                  >
-                    <CardContent className="p-5 flex gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-forest flex items-center justify-center shrink-0">
-                        <StatusIcon status={step.status} />
+                  <CardContent className="p-5 flex gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-forest flex items-center justify-center shrink-0">
+                      <StatusIcon status={step.status} />
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-4">
+                        <h3 className="font-semibold">{step.title}</h3>
+                        <StatusBadge status={step.status} />
                       </div>
 
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between gap-4">
-                          <h3 className="font-semibold">
-                            {step.title}
-                          </h3>
-                          <StatusBadge status={step.status} />
-                        </div>
-
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {step.description}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </StaggerItem>
-            )
-          )}
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {step.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </StaggerItem>
+          ))}
         </StaggerContainer>
       </Section>
     </>

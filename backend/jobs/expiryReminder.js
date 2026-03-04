@@ -1,6 +1,6 @@
 const cron = require("node-cron");
 const UserService = require("../models/userService");
-const { sendEmail } = require("../utils/mailer"); // ✅ correct file
+const { sendExpiryEmail } = require("../services/email.service");// ✅ correct file
 
 function getDaysLeft(today, expiryDate) {
   const start = new Date(today.setHours(0, 0, 0, 0));
@@ -23,30 +23,28 @@ cron.schedule("0 9 * * *", async () => {
 
     for (let item of services) {
       const daysLeft = getDaysLeft(today, item.expiryDate);
+      // console.log("Checking Service:");
+      // console.log("User:", item.user.email);
+      // console.log("Expiry Date:", item.expiryDate);
+      // console.log("Days Left:", daysLeft);
+      // console.log("Reminder Sent:", item.reminderSent);
+      // console.log("--------------------------");
 
       const reminderDays = [60, 30, 15];
 
       if (reminderDays.includes(daysLeft)) {
-        // ✅ prevent duplicate
         if (!item.reminderSent.includes(daysLeft)) {
-          const subject = `Service Expiry Reminder - ${daysLeft} Days Left`;
 
-          const message = `
-Hello ${item.user.name},
+          await sendExpiryEmail(
+            {
+              userEmail: item.user.email,
+              name: item.service.title,
+              authority: "Unique EPC",
+              validTill: item.expiryDate,
+            },
+            daysLeft
+          );
 
-Your service "${item.service.title}" will expire in ${daysLeft} days.
-
-Expiry Date: ${item.expiryDate.toDateString()}
-
-Please renew it before expiry.
-
-Regards,
-Unique EPC Team
-`;
-
-          await sendEmail(item.user.email, subject, message);
-
-          // Save reminder history
           item.reminderSent.push(daysLeft);
           await item.save();
 

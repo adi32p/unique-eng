@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn, Mail, Lock, Leaf } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { authApi } from "../../services/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -14,24 +15,11 @@ export default function Login() {
     password: "",
   });
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message);
-        return;
-      }
+      const { data } = await authApi.login(form);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
@@ -43,8 +31,8 @@ export default function Login() {
       } else {
         navigate("/user/dashboard");
       }
-    } catch (error) {
-      alert("Login failed");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Login failed");
     }
   };
 

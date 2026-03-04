@@ -25,7 +25,7 @@ import { Section, SectionHeader } from "../../../components/common/Section";
 /* ----------------------------------
    API Base URL
 ----------------------------------- */
-const API_BASE = "http://localhost:5000/api";
+import { servicesApi } from "../../../services/api";
 
 /* ----------------------------------
    Icon mapping
@@ -52,15 +52,7 @@ export default function ServiceList() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await fetch(`${API_BASE}/services`);
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch services");
-        }
-
-        const data = await res.json();
-        console.log("Fetched services:", data);
-
+        const { data } = await servicesApi.getAll();
         setServices(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -77,21 +69,12 @@ export default function ServiceList() {
   -------------------------------- */
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`${API_BASE}/services/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      await servicesApi.delete(id);
 
-      if (!res.ok) {
-        throw new Error("Delete failed");
-      }
-
-      // Remove deleted service from UI instantly
       setServices((prev) => prev.filter((service) => service._id !== id));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Delete failed:", error);
+      alert(error.response?.data?.message || "Delete failed");
     }
   };
 
@@ -107,22 +90,20 @@ export default function ServiceList() {
           />
 
           <Link to="/admin/services/add">
-  <Button
-    size="lg"
-    className="bg-leaf text-white hover:bg-leaf/90 btn-nature"
-  >
-    <Plus size={18} className="mr-2" />
-    Add Service
-  </Button>
-</Link>
+            <Button
+              size="lg"
+              className="bg-leaf text-white hover:bg-leaf/90 btn-nature"
+            >
+              <Plus size={18} className="mr-2" />
+              Add Service
+            </Button>
+          </Link>
         </div>
       </AnimatedSection>
 
       {/* 🔹 Loading State */}
       {loading && (
-        <p className="text-center text-muted-foreground">
-          Loading services...
-        </p>
+        <p className="text-center text-muted-foreground">Loading services...</p>
       )}
 
       {/* 🔹 Services Grid */}
@@ -139,7 +120,6 @@ export default function ServiceList() {
               <StaggerItem key={service._id}>
                 <Card className="group h-full bg-card border-border/50 card-nature hover:bg-gradient-to-br hover:from-leaf/5 hover:to-transparent transition-all">
                   <CardContent className="p-6 flex flex-col h-full">
-                    
                     {/* Icon */}
                     <div className="w-14 h-14 rounded-xl bg-gradient-forest flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <IconComponent className="text-white" size={24} />

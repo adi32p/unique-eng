@@ -8,7 +8,7 @@ import { Label } from "../../../components/ui/label";
 import { Section, SectionHeader } from "../../../components/common/Section";
 import { useToast } from "../../../hooks/use-toast";
 
-const API_BASE = "http://localhost:5000/api";
+import { newsApi } from "../../../services/api";
 
 export default function AddNews() {
   const navigate = useNavigate();
@@ -30,20 +30,7 @@ export default function AddNews() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_BASE}/news`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to publish news");
-      }
+      await newsApi.create(form);
 
       toast({
         title: "News Added",
@@ -54,7 +41,7 @@ export default function AddNews() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error?.response?.data?.message || "Failed to publish news",
         variant: "destructive",
       });
     } finally {
@@ -78,9 +65,7 @@ export default function AddNews() {
               <Input
                 required
                 value={form.title}
-                onChange={(e) =>
-                  setForm({ ...form, title: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
               />
             </div>
 
@@ -90,9 +75,7 @@ export default function AddNews() {
                 required
                 rows={3}
                 value={form.excerpt}
-                onChange={(e) =>
-                  setForm({ ...form, excerpt: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
               />
             </div>
 
@@ -102,9 +85,7 @@ export default function AddNews() {
                 required
                 rows={6}
                 value={form.content}
-                onChange={(e) =>
-                  setForm({ ...form, content: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, content: e.target.value })}
               />
             </div>
 
@@ -113,9 +94,7 @@ export default function AddNews() {
               <select
                 className="w-full border rounded px-3 py-2"
                 value={form.category}
-                onChange={(e) =>
-                  setForm({ ...form, category: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
               >
                 <option>Compliance</option>
                 <option>Industry</option>
@@ -143,10 +122,7 @@ export default function AddNews() {
                 Cancel
               </Button>
 
-              <Button
-                className="bg-leaf text-white"
-                disabled={loading}
-              >
+              <Button className="bg-leaf text-white" disabled={loading}>
                 {loading ? "Publishing..." : "Publish"}
               </Button>
             </div>

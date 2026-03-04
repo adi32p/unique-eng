@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Save,
-  ArrowLeft,
-} from "lucide-react";
+import { Save, ArrowLeft } from "lucide-react";
 
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
@@ -13,7 +10,7 @@ import { Section, SectionHeader } from "../../../components/common/Section";
 import { AnimatedSection } from "../../../components/common/AnimatedSection";
 import { useToast } from "../../../hooks/use-toast";
 
-const API_BASE = "http://localhost:5000/api";
+import { licensesApi } from "../../../services/api";
 
 interface LicenseForm {
   name: string;
@@ -40,26 +37,14 @@ export default function AddLicense() {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch(`${API_BASE}/licenses`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-        },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Failed to create license");
-      }
+      await licensesApi.create(form);
 
       toast({
         title: "Success",
@@ -71,8 +56,7 @@ export default function AddLicense() {
       toast({
         title: "Error",
         description:
-          error.message ||
-          "Cannot connect to server. Make sure backend is running on port 5000.",
+          error?.response?.data?.message || "Failed to create license",
         variant: "destructive",
       });
     }
@@ -89,7 +73,6 @@ export default function AddLicense() {
       <AnimatedSection className="max-w-3xl mx-auto">
         <Card className="card-nature">
           <CardContent className="p-8 space-y-6">
-
             <div>
               <label className="text-sm font-medium">License Name</label>
               <Input name="name" value={form.name} onChange={handleChange} />
@@ -97,34 +80,60 @@ export default function AddLicense() {
 
             <div>
               <label className="text-sm font-medium">Issuing Authority</label>
-              <Input name="authority" value={form.authority} onChange={handleChange} />
+              <Input
+                name="authority"
+                value={form.authority}
+                onChange={handleChange}
+              />
             </div>
 
             <div>
               <label className="text-sm font-medium">License Number</label>
-              <Input name="licenseNumber" value={form.licenseNumber} onChange={handleChange} />
+              <Input
+                name="licenseNumber"
+                value={form.licenseNumber}
+                onChange={handleChange}
+              />
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="text-sm font-medium">Issue Date</label>
-                <Input type="date" name="issueDate" value={form.issueDate} onChange={handleChange} />
+                <Input
+                  type="date"
+                  name="issueDate"
+                  value={form.issueDate}
+                  onChange={handleChange}
+                />
               </div>
 
               <div>
                 <label className="text-sm font-medium">Valid Till</label>
-                <Input type="date" name="validTill" value={form.validTill} onChange={handleChange} />
+                <Input
+                  type="date"
+                  name="validTill"
+                  value={form.validTill}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
             <div>
               <label className="text-sm font-medium">User Email</label>
-              <Input name="userEmail" value={form.userEmail} onChange={handleChange} />
+              <Input
+                name="userEmail"
+                value={form.userEmail}
+                onChange={handleChange}
+              />
             </div>
 
             <div>
               <label className="text-sm font-medium">Remarks (Optional)</label>
-              <Textarea name="remarks" value={form.remarks} onChange={handleChange} />
+              <Textarea
+                name="remarks"
+                value={form.remarks}
+                onChange={handleChange}
+              />
             </div>
 
             <div className="flex gap-4 pt-4">
@@ -145,7 +154,6 @@ export default function AddLicense() {
                 Save License
               </Button>
             </div>
-
           </CardContent>
         </Card>
       </AnimatedSection>

@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  Pencil,
-  Save,
-  ClipboardList,
-  CheckCircle,
-} from "lucide-react";
+import { Pencil, Save, ClipboardList, CheckCircle } from "lucide-react";
 
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
@@ -16,7 +11,7 @@ import { AnimatedSection } from "../../../components/common/AnimatedSection";
 /* ----------------------------------
    API Base
 ----------------------------------- */
-const API_BASE = "http://localhost:5000/api";
+import { servicesApi } from "../../../services/api";
 
 /* ----------------------------------
    Edit Service Page
@@ -34,13 +29,7 @@ export default function EditService() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const res = await fetch(`${API_BASE}/services/${serviceId}`);
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch service");
-        }
-
-        const data = await res.json();
+        const { data } = await servicesApi.getById(serviceId!);
 
         setTitle(data.title || "");
         setShortDescription(data.shortDescription || "");
@@ -74,39 +63,23 @@ export default function EditService() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${API_BASE}/services/${serviceId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          title,
-          shortDescription,
-          features,
-        }),
+      await servicesApi.update(serviceId!, {
+        title,
+        shortDescription,
+        features,
       });
 
-      if (!res.ok) {
-        throw new Error("Update failed");
-      }
-
-      const updatedService = await res.json();
-      console.log("Updated Service:", updatedService);
-
-      // Redirect back to service list
       navigate("/admin/services");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Update failed:", error);
+      alert(error.response?.data?.message || "Update failed");
     }
   };
 
   if (loading) {
     return (
       <Section>
-        <div className="text-muted-foreground">
-          Loading service details...
-        </div>
+        <div className="text-muted-foreground">Loading service details...</div>
       </Section>
     );
   }
@@ -135,7 +108,6 @@ export default function EditService() {
         <Card className="bg-background/80 backdrop-blur border-border/50 hover:shadow-nature transition-shadow">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
-              
               {/* Service Title */}
               <div>
                 <label className="text-sm font-medium">Service Title</label>

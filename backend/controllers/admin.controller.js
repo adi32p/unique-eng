@@ -143,11 +143,94 @@ exports.updateServiceStage = async (req, res) => {
     const message = `Your service "${userService.service.title}" is now ${userService.progress}% completed.`;
 
     // ✅ Send Email
+    const subject = `Update on Your ${userService.service.title} Service`;
+
+    const emailBody = `
+      <div style="margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center">
+              <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;margin-top:30px;border-radius:8px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="background:#1e293b;padding:20px;text-align:center;color:#ffffff;font-size:20px;font-weight:bold;">
+                    Unique Engineering Consultancy
+                  </td>
+                </tr>
+
+                <!-- Body -->
+                <tr>
+                  <td style="padding:30px;color:#333333;font-size:15px;line-height:1.6;">
+                    
+                    <p>Dear <strong>${userService.user.name}</strong>,</p>
+
+                    <p>
+                      We would like to inform you that your service 
+                      <strong>${userService.service.title}</strong> has been updated.
+                    </p>
+
+                    <table width="100%" style="margin:20px 0;border-collapse:collapse;">
+                      <tr>
+                        <td style="padding:8px 0;"><strong>Status:</strong></td>
+                        <td style="padding:8px 0;">${userService.status}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;"><strong>Progress:</strong></td>
+                        <td style="padding:8px 0;">${userService.progress}%</td>
+                      </tr>
+                    </table>
+
+                    ${stage === "license-completed"
+              ? `
+                          <p style="color:green;font-weight:bold;">
+                            🎉 Your service has been successfully completed.
+                          </p>
+                          <p>
+                            <strong>Completion Date:</strong> ${new Date().toLocaleDateString()}<br/>
+                            <strong>Expiry Date:</strong> ${new Date(userService.expiryDate).toLocaleDateString()}
+                          </p>
+                        `
+              : `
+                          <p>
+                            Our team is actively working on your service.
+                            We will notify you as soon as the next stage is completed.
+                          </p>
+                        `
+            }
+
+                    <p>
+                      If you have any questions, please contact our support team.
+                    </p>
+
+                    <p>
+                      Regards,<br/>
+                      <strong>Compliance Support Team</strong>
+                    </p>
+
+                  </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                  <td style="background:#f1f5f9;padding:15px;text-align:center;font-size:12px;color:#666;">
+                    © ${new Date().getFullYear()} Unique Engineering Consultancy. All rights reserved.
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      `;
+
     await sendEmail(
       userService.user.email,
-      "Service Progress Updated",
-      message
+      subject,
+      emailBody
     );
+
 
     // ✅ Real-time Notification
     await createNotification(

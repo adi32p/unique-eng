@@ -9,6 +9,7 @@ import { Progress } from "../../../components/ui/progress";
 import { Button } from "../../../components/ui/button";
 import { Section, SectionHeader } from "../../../components/common/Section";
 import { AnimatedSection } from "../../../components/common/AnimatedSection";
+import api from "../../../services/api";
 
 /* ------------------------------------------------------------------ */
 /* Admin Update Service Progress Page */
@@ -32,20 +33,7 @@ export default function UpdateServiceProgress() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(
-          `http://localhost:5000/api/user-services/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch service");
-
-        const data = await res.json();
+        const { data } = await api.get(`/user-services/${id}`);
         setService(data);
         setSelectedStage(data.stage || "");
 
@@ -84,7 +72,7 @@ export default function UpdateServiceProgress() {
   ];
 
   const currentStageData = stageOptions.find(
-    (stage) => stage.value === selectedStage
+    (stage) => stage.value === selectedStage,
   );
 
   /* ------------------------------------------------------------------ */
@@ -97,39 +85,19 @@ export default function UpdateServiceProgress() {
       setError("");
       setSuccess("");
 
-      if (
-        selectedStage === "license-completed" &&
-        !expiryDate
-      ) {
+      if (selectedStage === "license-completed" && !expiryDate) {
         setError("Please select expiry date");
         setUpdating(false);
         return;
       }
 
-      const token = localStorage.getItem("token");
+      const { data } = await api.put(`/admin/user-service/${id}/stage`, {
+        stage: selectedStage,
+        expiryDate:
+          selectedStage === "license-completed" ? expiryDate : undefined,
+      });
 
-      const res = await fetch(
-        `http://localhost:5000/api/admin/user-service/${id}/stage`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            stage: selectedStage,
-            expiryDate:
-              selectedStage === "license-completed"
-                ? expiryDate
-                : undefined,
-          }),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to update progress");
-
-      const result = await res.json();
-      setService(result.userService);
+      setService(data.userService);
       setSuccess("Progress updated successfully ✅");
     } catch (err: any) {
       setError(err.message);
@@ -206,15 +174,11 @@ export default function UpdateServiceProgress() {
 
               {/* Stage Selector */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Select New Stage
-                </label>
+                <label className="text-sm font-medium">Select New Stage</label>
 
                 <select
                   value={selectedStage}
-                  onChange={(e) =>
-                    setSelectedStage(e.target.value)
-                  }
+                  onChange={(e) => setSelectedStage(e.target.value)}
                   className="w-full border rounded-lg p-2 bg-background"
                 >
                   <option value="">-- Select Stage --</option>
@@ -238,16 +202,12 @@ export default function UpdateServiceProgress() {
               {/* ✅ Expiry Date Input (Only When Completed) */}
               {selectedStage === "license-completed" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Set Expiry Date
-                  </label>
+                  <label className="text-sm font-medium">Set Expiry Date</label>
 
                   <input
                     type="date"
                     value={expiryDate}
-                    onChange={(e) =>
-                      setExpiryDate(e.target.value)
-                    }
+                    onChange={(e) => setExpiryDate(e.target.value)}
                     className="w-full border rounded-lg p-2 bg-background"
                     required
                   />
@@ -255,12 +215,8 @@ export default function UpdateServiceProgress() {
               )}
 
               {/* Messages */}
-              {error && (
-                <p className="text-red-500 text-sm">{error}</p>
-              )}
-              {success && (
-                <p className="text-green-600 text-sm">{success}</p>
-              )}
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {success && <p className="text-green-600 text-sm">{success}</p>}
 
               {/* Update Button */}
               <Button
@@ -268,8 +224,7 @@ export default function UpdateServiceProgress() {
                 disabled={
                   !selectedStage ||
                   updating ||
-                  (selectedStage === "license-completed" &&
-                    !expiryDate)
+                  (selectedStage === "license-completed" && !expiryDate)
                 }
                 className="w-full"
               >

@@ -10,8 +10,7 @@ import { Label } from "../../../components/ui/label";
 import { Badge } from "../../../components/ui/badge";
 import { Section, SectionHeader } from "../../../components/common/Section";
 import { useToast } from "../../../hooks/use-toast";
-
-const API_BASE = "http://localhost:5000/api";
+import { projectsApi } from "../../../services/api";
 
 /* ------------------------------------------------------------------ */
 interface ProjectForm {
@@ -51,7 +50,7 @@ export default function AddProject() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -61,17 +60,6 @@ export default function AddProject() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token"); // admin token
-
-      if (!token) {
-        toast({
-          title: "Unauthorized",
-          description: "Please login as admin",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const formData = new FormData();
       formData.append("title", form.title);
       formData.append("location", form.location);
@@ -82,29 +70,14 @@ export default function AddProject() {
       if (form.image) {
         formData.append("image", form.image);
       }
-      const response = await fetch(
-        `${API_BASE}/projects`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to add project");
-      }
+      await projectsApi.create(formData);
 
       toast({
         title: "Project Added",
         description: "Gallery project added successfully",
       });
 
-      // Reset form
       setForm({
         title: "",
         location: "",
@@ -113,13 +86,14 @@ export default function AddProject() {
         description: "",
         image: null,
       });
+
       setPreview("");
 
       navigate("/admin/gallery");
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Something went wrong",
+        description: error.response?.data?.message || "Something went wrong",
         variant: "destructive",
       });
     }
@@ -143,9 +117,7 @@ export default function AddProject() {
                 <Label>Project Image</Label>
                 <div
                   className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary"
-                  onClick={() =>
-                    document.getElementById("imageInput")?.click()
-                  }
+                  onClick={() => document.getElementById("imageInput")?.click()}
                 >
                   <ImageIcon className="mx-auto mb-2 text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">
@@ -225,9 +197,7 @@ export default function AddProject() {
                 >
                   Cancel
                 </Button>
-                <Button className="bg-leaf text-white">
-                  Save Project
-                </Button>
+                <Button className="bg-leaf text-white">Save Project</Button>
               </div>
             </form>
           </CardContent>

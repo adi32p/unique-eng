@@ -10,12 +10,12 @@ import {
   Building2,
   ClipboardList,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Section, SectionHeader } from "@/components/common/Section";
-import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/common/AnimatedSection";
-import { FloatingLeaves } from "@/components/common/Parallax";
-import { services } from "@/data/mockData";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { Section, SectionHeader } from "../../components/common/Section";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "../../components/common/AnimatedSection";
+import { FloatingLeaves } from "../../components/common/Parallax";
+import { services } from "../../data/mockData";
 
 // Icon mapping (same as Services page)
 const iconMap: Record<string, React.ElementType> = {

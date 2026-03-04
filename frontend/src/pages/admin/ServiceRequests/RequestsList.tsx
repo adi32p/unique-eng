@@ -19,7 +19,7 @@ import {
 } from "../../../components/common/AnimatedSection";
 
 /* API Base */
-const API_BASE = "http://localhost:5000/api";
+import { requestsApi } from "../../../services/api";
 
 const statusStyles: Record<string, string> = {
   Pending: "bg-sunrise/10 text-sunrise",
@@ -35,14 +35,15 @@ export default function RequestsList() {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await fetch(`${API_BASE}/requests`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const response = await requestsApi.getAll();
 
-        const data = await res.json();
-        setRequests(data);
+        // 🔥 Newest on top
+        const sorted = response.data.sort(
+          (a: any, b: any) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+
+        setRequests(sorted);
       } catch (error) {
         console.error("Error fetching requests:", error);
       } finally {
@@ -56,20 +57,10 @@ export default function RequestsList() {
   /* 🔹 Update Status */
   const updateStatus = async (id: string, status: string) => {
     try {
-      await fetch(`${API_BASE}/requests/${id}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ status }),
-      });
+      await requestsApi.updateStatus(id, { status });
 
-      // Update UI instantly
       setRequests((prev) =>
-        prev.map((req) =>
-          req._id === id ? { ...req, status } : req
-        )
+        prev.map((req) => (req._id === id ? { ...req, status } : req)),
       );
     } catch (error) {
       console.error("Status update failed:", error);
@@ -98,7 +89,6 @@ export default function RequestsList() {
             <Card className="card-nature bg-card border-border/50 hover:shadow-nature transition-all">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                  
                   {/* Left Info */}
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-primary font-semibold">
@@ -142,9 +132,7 @@ export default function RequestsList() {
                     <Button
                       size="sm"
                       className="bg-leaf text-white hover:bg-leaf/90"
-                      onClick={() =>
-                        updateStatus(request._id, "Approved")
-                      }
+                      onClick={() => updateStatus(request._id, "Approved")}
                     >
                       <CheckCircle size={14} className="mr-1" />
                       Approve
@@ -153,9 +141,7 @@ export default function RequestsList() {
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() =>
-                        updateStatus(request._id, "Rejected")
-                      }
+                      onClick={() => updateStatus(request._id, "Rejected")}
                     >
                       <XCircle size={14} className="mr-1" />
                       Reject

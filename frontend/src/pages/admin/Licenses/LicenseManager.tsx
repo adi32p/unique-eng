@@ -20,7 +20,7 @@ import {
 } from "../../../components/common/AnimatedSection";
 import { useToast } from "../../../hooks/use-toast";
 
-const API_BASE = "http://localhost:5000/api";
+import { licensesApi } from "../../../services/api";
 
 interface License {
   _id: string;
@@ -58,33 +58,14 @@ export default function LicenseManager() {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("token");
+      const response = await licensesApi.getAll();
 
-      const res = await fetch(`${API_BASE}/licenses`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        console.log("Backend error:", errText);
-        throw new Error("Failed to fetch licenses");
-      }
-
-      const data = await res.json();
-
-      console.log("LICENSE API RESPONSE:", data);
-
-      if (Array.isArray(data)) {
-        setLicenses(data);
+      if (Array.isArray(response.data)) {
+        setLicenses(response.data);
       } else {
-        console.error("Response is not array:", data);
         setLicenses([]);
       }
     } catch (error) {
-      console.error("Fetch error:", error);
       toast({
         title: "Error",
         description: "Cannot connect to backend server.",
@@ -97,16 +78,7 @@ export default function LicenseManager() {
 
   const handleDelete = async (id: string) => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch(`${API_BASE}/licenses/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed to delete");
+      await licensesApi.delete(id);
 
       setLicenses((prev) => prev.filter((item) => item._id !== id));
 
@@ -114,10 +86,11 @@ export default function LicenseManager() {
         title: "Deleted",
         description: "License deleted successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to delete license",
+        description:
+          error?.response?.data?.message || "Failed to delete license",
         variant: "destructive",
       });
     }
@@ -157,7 +130,6 @@ export default function LicenseManager() {
               <StaggerItem key={license._id}>
                 <Card className="group h-full bg-card border-border/50 hover:shadow-nature transition-shadow">
                   <CardContent className="p-6 flex flex-col h-full">
-
                     <div className="flex items-center justify-between mb-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-forest flex items-center justify-center">
                         <FileCheck className="text-white" size={22} />
@@ -168,8 +140,8 @@ export default function LicenseManager() {
                           status === "Active"
                             ? "bg-leaf/20 text-leaf"
                             : status === "Expired"
-                            ? "bg-red-500/20 text-red-500"
-                            : "bg-sunrise/20 text-sunrise"
+                              ? "bg-red-500/20 text-red-500"
+                              : "bg-sunrise/20 text-sunrise"
                         }`}
                       >
                         {status}
@@ -211,7 +183,6 @@ export default function LicenseManager() {
                         Delete
                       </Button>
                     </motion.div>
-
                   </CardContent>
                 </Card>
               </StaggerItem>

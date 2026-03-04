@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import {
-  CheckCircle,
-  AlertTriangle,
-  Info,
-  Clock,
-} from "lucide-react";
+import { CheckCircle, AlertTriangle, Info, Clock } from "lucide-react";
 
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
@@ -22,7 +17,7 @@ interface Notification {
   createdAt: string;
 }
 
-const API_BASE = "http://localhost:5000/api";
+import { notificationsApi } from "../../services/api";
 
 function NotificationIcon({ type }: { type: string }) {
   if (type === "success")
@@ -39,15 +34,9 @@ export default function Notifications() {
 
   const fetchNotifications = async () => {
     try {
-      if (!token) return;
+      const res = await notificationsApi.getAll();
+      const data = res.data;
 
-      const res = await fetch(`${API_BASE}/notifications`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
       setNotifications(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
@@ -78,25 +67,12 @@ export default function Notifications() {
 
   /* -------------------------------------------------------- */
   const toggleRead = async (id: string) => {
-    if (!token) return;
-
     try {
-      const res = await fetch(
-        `${API_BASE}/notifications/${id}/toggle-read`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const updated = await res.json();
+      const res = await notificationsApi.toggleRead(id);
+      const updated = res.data;
 
       setNotifications((prev) =>
-        prev.map((n) =>
-          n._id === id ? { ...n, read: updated.read } : n
-        )
+        prev.map((n) => (n._id === id ? { ...n, read: updated.read } : n)),
       );
     } catch (err) {
       console.error(err);
@@ -104,30 +80,23 @@ export default function Notifications() {
   };
 
   const markAllRead = async () => {
-    if (!token) return;
-
-    await fetch(`${API_BASE}/notifications/mark-all-read`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    fetchNotifications();
+    try {
+      await notificationsApi.markAllRead();
+      fetchNotifications();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleString();
+  const formatDate = (date: string) => new Date(date).toLocaleString();
 
   return (
     <>
       <Section className="bg-gradient-to-br from-forest via-primary to-forest text-white">
         <AnimatedSection>
-          <h1 className="text-3xl font-bold mb-2">
-            Notifications 🔔
-          </h1>
+          <h1 className="text-3xl font-bold mb-2">Notifications 🔔</h1>
           <p className="text-white/80">
             You have {unreadCount} unread notifications
           </p>
@@ -152,9 +121,7 @@ export default function Notifications() {
             <Card
               key={note._id}
               className={`shadow-md transition-all ${
-                note.read
-                  ? "bg-white"
-                  : "bg-green-50 border border-green-300"
+                note.read ? "bg-white" : "bg-green-50 border border-green-300"
               }`}
             >
               <CardContent className="p-5 flex gap-4">
@@ -164,19 +131,13 @@ export default function Notifications() {
 
                 <div className="flex-1">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">
-                      {note.title}
-                    </h3>
+                    <h3 className="font-semibold">{note.title}</h3>
                     {!note.read && (
-                      <Badge className="bg-green-200 text-green-800">
-                        New
-                      </Badge>
+                      <Badge className="bg-green-200 text-green-800">New</Badge>
                     )}
                   </div>
 
-                  <p className="text-sm text-gray-600 mt-1">
-                    {note.message}
-                  </p>
+                  <p className="text-sm text-gray-600 mt-1">{note.message}</p>
 
                   <div className="flex justify-between items-center mt-3">
                     <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -189,9 +150,7 @@ export default function Notifications() {
                       variant="outline"
                       onClick={() => toggleRead(note._id)}
                     >
-                      {note.read
-                        ? "Mark as Unread"
-                        : "Mark as Read"}
+                      {note.read ? "Mark as Unread" : "Mark as Read"}
                     </Button>
                   </div>
                 </div>

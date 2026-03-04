@@ -19,7 +19,7 @@ import {
   StaggerItem,
 } from "../../components/common/AnimatedSection";
 
-const API_BASE = "http://localhost:5000/api/user-services";
+import { userServicesApi } from "../../services/api";
 
 /* Status Badge */
 function StatusBadge({ status }: { status: string }) {
@@ -64,15 +64,10 @@ export default function MyServices() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const res = await userServicesApi.getMyServices();
 
-        const response = await fetch(`${API_BASE}/my-services`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const data = res.data;
 
-        const data = await response.json();
         setMyServices(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Failed to fetch services", error);
@@ -153,9 +148,7 @@ export default function MyServices() {
                             <StatusBadge status={service.status} />
 
                             {expiryInfo?.isExpired && (
-                              <Badge variant="destructive">
-                                🔴 Expired
-                              </Badge>
+                              <Badge variant="destructive">🔴 Expired</Badge>
                             )}
 
                             {expiryInfo?.isExpiringSoon &&
@@ -187,7 +180,7 @@ export default function MyServices() {
                               Expiry Date:{" "}
                               <span className="font-medium">
                                 {new Date(
-                                  service.expiryDate
+                                  service.expiryDate,
                                 ).toLocaleDateString()}
                               </span>
                             </div>
@@ -219,9 +212,7 @@ export default function MyServices() {
                           </Button>
 
                           {expiryInfo?.isExpired && (
-                            <Button size="sm">
-                              🔁 Renew Service
-                            </Button>
+                            <Button size="sm">🔁 Renew Service</Button>
                           )}
                         </div>
                       </CardContent>

@@ -10,11 +10,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-exports.sendEmail = async (to, subject, text) => {
+exports.sendEmail = async (to, subject, htmlContent) => {
   await transporter.sendMail({
     from: `"Unique EPC" <${process.env.EMAIL_USER}>`,
     to,
     subject,
-    text,
+    html: htmlContent, 
   });
 };

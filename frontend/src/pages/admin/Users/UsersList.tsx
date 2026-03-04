@@ -1,20 +1,13 @@
-import {
-  Users,
-  Mail,
-  ShieldCheck,
-  User,
-  Eye,
-  Ban,
-} from "lucide-react";
+import { Users, Mail, ShieldCheck, User, Eye, Ban } from "lucide-react";
 
 import { Card, CardContent } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Section } from "../../../components/common/Section";
 import { AnimatedSection } from "../../../components/common/AnimatedSection";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";   // ✅ Added
+import { useNavigate } from "react-router-dom"; // ✅ Added
 
-const API_BASE = "http://localhost:5000/api";
+import { adminApi } from "../../../services/api";
 
 interface UserType {
   _id: string;
@@ -26,7 +19,7 @@ interface UserType {
 
 export default function UsersList() {
   const [users, setUsers] = useState<UserType[]>([]);
-  const navigate = useNavigate();   // ✅ Added
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsers();
@@ -34,16 +27,11 @@ export default function UsersList() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${API_BASE}/admin/users`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-        },
-      });
+      // ✅ Using centralized axios API
+      const res = await adminApi.getUsers();
 
-      if (!res.ok) throw new Error("Failed to fetch users");
-
-      const data = await res.json();
-      setUsers(data);
+      // axios response data
+      setUsers(res.data);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -65,9 +53,7 @@ export default function UsersList() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users size={18} />
             Total Users:{" "}
-            <span className="font-medium text-primary">
-              {users.length}
-            </span>
+            <span className="font-medium text-primary">{users.length}</span>
           </div>
         </div>
       </AnimatedSection>
@@ -78,16 +64,13 @@ export default function UsersList() {
             <Card className="bg-background/80 backdrop-blur border-border/50 hover:shadow-nature transition-all">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-forest flex items-center justify-center text-white font-semibold">
                       {user.name?.charAt(0)}
                     </div>
 
                     <div>
-                      <div className="font-semibold text-lg">
-                        {user.name}
-                      </div>
+                      <div className="font-semibold text-lg">{user.name}</div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Mail size={14} />
                         {user.email}
@@ -140,7 +123,6 @@ export default function UsersList() {
                       </Button>
                     )}
                   </div>
-
                 </div>
               </CardContent>
             </Card>

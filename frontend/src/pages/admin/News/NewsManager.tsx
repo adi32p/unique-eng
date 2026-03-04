@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import {
-  Newspaper,
-  Plus,
-  Edit,
-  Trash2,
-  Calendar,
-} from "lucide-react";
+import { Newspaper, Plus, Edit, Trash2, Calendar } from "lucide-react";
 
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
@@ -19,7 +13,7 @@ import {
 } from "../../../components/common/AnimatedSection";
 import { useToast } from "../../../hooks/use-toast";
 
-const API_BASE = "http://localhost:5000/api";
+import { newsApi } from "../../../services/api";
 
 interface NewsItem {
   _id: string;
@@ -38,46 +32,27 @@ export default function NewsManager() {
   const [loading, setLoading] = useState(true);
 
   /* Fetch News */
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/news`);
-        const data = await res.json();
-        setNewsList(data);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch news",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchNews = async () => {
+    try {
+      setLoading(true);
 
-    fetchNews();
-  }, []);
+      const response = await newsApi.getAll();
+      setNewsList(response.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch news",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* Delete News */
   const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this news?"
-    );
-    if (!confirmDelete) return;
-
     try {
-      const res = await fetch(`${API_BASE}/news/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Delete failed");
-      }
+      await newsApi.delete(id);
 
       setNewsList((prev) => prev.filter((item) => item._id !== id));
 
@@ -88,7 +63,7 @@ export default function NewsManager() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error?.response?.data?.message || "Failed to delete news",
         variant: "destructive",
       });
     }
@@ -150,11 +125,7 @@ export default function NewsManager() {
                     whileHover={{ opacity: 1, y: 0 }}
                     className="mt-6 flex gap-3"
                   >
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1"
-                    >
+                    <Button size="sm" variant="outline" className="flex-1">
                       <Edit size={16} className="mr-2" />
                       Edit
                     </Button>
