@@ -1,31 +1,21 @@
-const nodemailer = require("nodemailer");
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
+const sgMail = require("@sendgrid/mail");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.sendEmail = async (to, subject, htmlContent) => {
   try {
     console.log("Sending email to:", to);
 
-    const info = await transporter.sendMail({
-      from: `"Unique EPC" <${process.env.EMAIL_USER}>`,
+    await sgMail.send({
       to,
+      from: process.env.EMAIL_USER, // Must be verified sender
       subject,
       html: htmlContent,
     });
 
-    console.log("Email sent:", info.messageId);
+    console.log("Email sent successfully");
   } catch (error) {
-    console.error("EMAIL ERROR:", error);
+    console.error("EMAIL ERROR:", error.response?.body || error);
     throw error;
   }
 };

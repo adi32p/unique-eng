@@ -182,7 +182,7 @@ exports.updateServiceStage = async (req, res) => {
                     </table>
 
                     ${stage === "license-completed"
-              ? `
+        ? `
                           <p style="color:green;font-weight:bold;">
                             🎉 Your service has been successfully completed.
                           </p>
@@ -191,13 +191,13 @@ exports.updateServiceStage = async (req, res) => {
                             <strong>Expiry Date:</strong> ${new Date(userService.expiryDate).toLocaleDateString()}
                           </p>
                         `
-              : `
+        : `
                           <p>
                             Our team is actively working on your service.
                             We will notify you as soon as the next stage is completed.
                           </p>
                         `
-            }
+      }
 
                     <p>
                       If you have any questions, please contact our support team.
@@ -225,11 +225,14 @@ exports.updateServiceStage = async (req, res) => {
       </div>
       `;
 
-    await sendEmail(
+    sendEmail(
       userService.user.email,
       subject,
       emailBody
-    );
+    ).catch(err => {
+      console.error("❌ EMAIL ERROR:");
+      console.error(err.response?.body || err.message || err);
+    });
 
 
     // ✅ Real-time Notification

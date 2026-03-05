@@ -1,17 +1,10 @@
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.sendExpiryEmail = async (license, daysLeft) => {
-  await transporter.sendMail({
-    from: `"Unique Engineering Consultancy" <${process.env.EMAIL_USER}>`,
+  await sgMail.send({
     to: license.userEmail,
+    from: process.env.EMAIL_USER,
     subject: `License Expiry Reminder – ${daysLeft} Day${daysLeft > 1 ? "s" : ""} Remaining`,
     html: `
     <div style="margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,sans-serif;">
