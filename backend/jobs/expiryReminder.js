@@ -10,51 +10,51 @@ function getDaysLeft(today, expiryDate) {
 }
 
 // ✅ RUN DAILY AT 9 AM
-cron.schedule("0 9 * * *", async () => {
-  console.log("🔁 Running Service Expiry Reminder Job...");
+  cron.schedule("0 9 * * *", async () => {
+    console.log("🔁 Running Service Expiry Reminder Job...");
 
-  try {
-    const today = new Date();
+    try {
+      const today = new Date();
 
-    const services = await UserService.find({
-      status: "Completed",
-      expiryDate: { $ne: null },
-    }).populate("user service");
+      const services = await UserService.find({
+        status: "Completed",
+        expiryDate: { $ne: null },
+      }).populate("user service");
 
-    for (let item of services) {
-      const daysLeft = getDaysLeft(today, item.expiryDate);
-      // console.log("Checking Service:");
-      // console.log("User:", item.user.email);
-      // console.log("Expiry Date:", item.expiryDate);
-      // console.log("Days Left:", daysLeft);
-      // console.log("Reminder Sent:", item.reminderSent);
-      // console.log("--------------------------");
+      for (let item of services) {
+        const daysLeft = getDaysLeft(today, item.expiryDate);
 
-      const reminderDays = [60, 30, 15];
 
-      if (reminderDays.includes(daysLeft)) {
-        if (!item.reminderSent.includes(daysLeft)) {
+        const reminderDays = [60, 30, 15];
 
-          await sendExpiryEmail(
-            {
-              userEmail: item.user.email,
-              name: item.service.title,
-              authority: "Unique EPC",
-              validTill: item.expiryDate,
-            },
-            daysLeft
-          );
+        if (reminderDays.includes(daysLeft)) {
+          if (!item.reminderSent.includes(daysLeft)) {
 
-          item.reminderSent.push(daysLeft);
-          await item.save();
+            await sendExpiryEmail(
+              {
+                userEmail: item.user.email,
+                name: item.service.title,
+                authority: "Unique EPC",
+                validTill: item.expiryDate,
+              },
+              daysLeft
+            );
 
-          console.log(
-            `📧 Reminder sent to ${item.user.email} - ${daysLeft} days left`
-          );
+            item.reminderSent.push(daysLeft);
+            await item.save();
+
+            console.log(
+              `📧 Reminder sent to ${item.user.email} - ${daysLeft} days left`
+            );
+          }
         }
       }
+    } catch (error) {
+      console.error("❌ Expiry Reminder Error:", error);
     }
-  } catch (error) {
-    console.error("❌ Expiry Reminder Error:", error);
   }
-});
+  ,
+  {
+    timezone: "Asia/Kolkata",
+  }
+);
